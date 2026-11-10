@@ -1,0 +1,27 @@
+name: Archive independent Shorash category images
+on:
+  push:
+    branches:
+      - feat/shorash-kurdunus-independent-categories-20261110
+    paths:
+      - imports/kurdunus-category-images-20261110.json
+      - scripts/download-category-images-20261110.py
+      - .github/workflows/download-category-images-20261110.yml
+permissions:
+  contents: write
+jobs:
+  fetch_images:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch and validate Shorash category assets
+        run: python3 scripts/download-category-images-20261110.py
+      - name: Commit verified images to isolated branch
+        run: |
+          git config user.name "shorash-menu-assets"
+          git config user.email "shorash-menu-assets@users.noreply.github.com"
+          git add restbr-2026-11-10/categories/
+          git diff --cached --quiet && exit 0
+          git commit -m "assets: preserve all 16 Shorash category images independent of Kurdunus"
+          git push origin HEAD:feat/shorash-kurdunus-independent-categories-20261110
