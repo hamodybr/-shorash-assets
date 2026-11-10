@@ -1,0 +1,26 @@
+name: Copy Shorash updated images (pilot)
+on:
+  push:
+    branches: [sync/shorash-kurdunus-20261110]
+    paths:
+      - "imports/shorash-images-20261110.json"
+      - "scripts/download-shorash-images-20261110.py"
+      - ".github/workflows/sync-shorash-images-20261110.yml"
+permissions:
+  contents: write
+jobs:
+  download-images:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download only verified public food images
+        run: python3 scripts/download-shorash-images-20261110.py
+      - name: Save images to staging branch
+        run: |
+          git config user.name "shorash-asset-sync"
+          git config user.email "shorash-asset-sync@users.noreply.github.com"
+          git add restbr-2026-11-10/
+          git diff --cached --quiet && exit 0
+          git commit -m "assets: archive updated Kurdunus images for RESTBR menu"
+          git push origin HEAD:sync/shorash-kurdunus-20261110
